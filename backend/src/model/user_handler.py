@@ -6,7 +6,7 @@ from table.user import User, GenderEnum
 def create_user(
     db: Session, 
     username: str, 
-    password: str, 
+    hashed_password: str, 
     full_name: str, 
     email: str, 
     birth_date, 
@@ -25,7 +25,7 @@ def create_user(
     # 2. 유저 객체 생성 (id는 자동 생성되므로 제외)
     db_user = User(
         username=username,
-        hashed_password=f"hash_{password}", # 실무에선 비밀번호 암호화 필수
+        hashed_password=hashed_password, # 실무에선 비밀번호 암호화 필수
         full_name=full_name,
         email=email,
         birth_date=birth_date,

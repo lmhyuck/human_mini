@@ -2,6 +2,8 @@
 import bcrypt
 from sqlalchemy import text 
 from util.database import engine
+from model.user_handler import get_user
+from util.database import SessionLocal
 
 from .user_service import get_user_from_db, change_password_in_db
 
@@ -13,16 +15,23 @@ users = {
 
 # 비밀번호 유효성 검증
 def verify_user(username: str, password: str) -> bool:
-    user_record = get_user_from_db(username)
-    if user_record:
-        stored_hash = user_record.hashed_password # DB에서 불러온 해시
-        if isinstance(stored_hash, str):
-            stored_hash = stored_hash.encode('utf-8')
+    db = SessionLocal()
+    
+    try :
+        user_record = get_user(db, username=username)
+        if user_record:
+            stored_hash = user_record.hashed_password # DB에서 불러온 해시
+            if isinstance(stored_hash, str):
+                stored_hash = stored_hash.encode('utf-8')
 
-        pw_bytes = password.encode('utf-8')
+            pw_bytes = password.encode('utf-8')
 
-        return bcrypt.checkpw(pw_bytes, stored_hash)
-    return False
+            return bcrypt.checkpw(pw_bytes, stored_hash)
+    except Exception as E :
+        print(E)
+        return False
+    finally :
+        db.close()
 
 
 # 비밀번호 변경
