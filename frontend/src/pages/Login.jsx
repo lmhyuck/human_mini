@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
   Link as MuiLink,
+  Stack,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -103,7 +104,6 @@ export default function Login() {
           }}
         >
           <CardContent sx={{ p: { xs: 3, sm: 5 } }}>
-            {/* 로고 */}
             <Typography
               component={Link}
               to="/"
@@ -126,7 +126,6 @@ export default function Login() {
               🍃 NEARGARDEN
             </Typography>
 
-            {/* 설명 */}
             <Typography
               variant="body1"
               align="center"
@@ -191,22 +190,32 @@ export default function Login() {
                 로그인
               </Button>
 
-              <Typography
-                variant="body2"
-                align="center"
-                color="text.secondary"
-                sx={{ mt: 3 }}
+              <Stack
+                direction="row"
+                justifyContent="center"
+                spacing={2}
+                sx={{ mt: 2 }}
               >
-                계정이 없으신가요?{" "}
+                <MuiLink
+                  component={Link}
+                  to="/find-id"
+                  underline="hover"
+                  sx={{ fontWeight: 600, fontSize: 14 }}
+                >
+                  아이디 찾기
+                </MuiLink>
+
+                <Typography color="text.disabled">|</Typography>
+
                 <MuiLink
                   component={Link}
                   to="/signup"
                   underline="hover"
-                  sx={{ fontWeight: 600 }}
+                  sx={{ fontWeight: 600, fontSize: 14 }}
                 >
                   회원가입
                 </MuiLink>
-              </Typography>
+              </Stack>
             </Box>
           </CardContent>
         </Card>
