@@ -25,6 +25,8 @@ export default function Login() {
     password: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -40,46 +42,65 @@ export default function Login() {
   };
 
   const validate = () => {
-    let newErrors = {};
-    let isValid = true;
+    const newErrors = {};
 
     if (!form.userId.trim()) {
       newErrors.userId = "아이디를 입력해주세요.";
-      isValid = false;
     } else if (form.userId.trim().length < 4) {
       newErrors.userId = "아이디는 4자 이상이어야 합니다.";
-      isValid = false;
     }
 
     if (!form.password.trim()) {
       newErrors.password = "비밀번호를 입력해주세요.";
-      isValid = false;
     } else if (form.password.length < 4) {
       newErrors.password = "비밀번호는 4자 이상이어야 합니다.";
-      isValid = false;
     }
 
     setErrors(newErrors);
-    return isValid;
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validate()) return;
+    if (!validate() || isSubmitting) return;
 
-    // 임시 로그인 체크
-    if (form.userId === "admin" && form.password === "1234") {
-      const loginUser = {
-        userId: form.userId,
-        isLogin: true,
-      };
+    const payload = {
+      username: form.userId.trim(),
+      password: form.password,
+    };
 
-      sessionStorage.setItem("loginUser", JSON.stringify(loginUser));
-      alert("로그인 성공!");
-      navigate("/");
-    } else {
-      alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const loginUser = {
+          username: form.userId.trim(),
+          isLogin: true,
+        };
+
+        sessionStorage.setItem("loginUser", JSON.stringify(loginUser));
+        alert(data.message || "로그인 성공!");
+        navigate("/");
+      } else {
+        alert(data.message || "아이디 또는 비밀번호가 올바르지 않습니다.");
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error);
+      alert("서버와 연결할 수 없습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -176,6 +197,7 @@ export default function Login() {
                 fullWidth
                 variant="contained"
                 size="large"
+                disabled={isSubmitting}
                 sx={{
                   mt: 3,
                   py: 1.4,

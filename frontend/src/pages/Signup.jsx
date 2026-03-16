@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const EXISTING_IDS = ["admin", "testuser", "hello123"];
 const EXISTING_EMAILS = ["test@gmail.com", "admin@naver.com", "user@daum.net"];
@@ -36,6 +36,7 @@ const INITIAL_FORM = {
   phone1: "",
   phone2: "",
   phone3: "",
+  telecomProvider: "",
   gender: "",
   emailId: "",
   emailDomain: "",
@@ -45,6 +46,7 @@ const INITIAL_FORM = {
 };
 
 function Signup() {
+  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
   const years = useMemo(
@@ -63,6 +65,7 @@ function Signup() {
   const [domainReadOnly, setDomainReadOnly] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const email = `${form.emailId.trim()}@${form.emailDomain.trim()}`;
 
@@ -98,9 +101,12 @@ function Signup() {
 
     if (name === "userid") resetIdCheck();
     if (name === "emailId" || name === "emailDomain") resetEmailCheck();
-    if (name === "year" || name === "month" || name === "day")
+    if (name === "year" || name === "month" || name === "day") {
       clearFieldError("birth");
-    if (name === "gender") clearFieldError("gender");
+    }
+    if (name === "gender") {
+      clearFieldError("gender");
+    }
   };
 
   const handleNumberChange = (e) => {
@@ -126,7 +132,7 @@ function Signup() {
     clearFieldError("emailDomain");
   };
 
-  const checkDuplicateId = () => {
+  const checkDuplicateId = async () => {
     const userid = form.userid.trim();
 
     if (!userid) {
@@ -149,6 +155,7 @@ function Signup() {
       return;
     }
 
+    // 백 중복확인 API가 아직 없어서 임시 배열 체크 유지
     if (EXISTING_IDS.includes(userid)) {
       setIdMsg("이미 사용 중인 아이디입니다.");
       setIdChecked(false);
@@ -159,7 +166,7 @@ function Signup() {
     setIdChecked(true);
   };
 
-  const checkDuplicateEmail = () => {
+  const checkDuplicateEmail = async () => {
     if (!form.emailId.trim()) {
       setErrors((prev) => ({
         ...prev,
@@ -190,6 +197,7 @@ function Signup() {
       return;
     }
 
+    // 백 중복확인 API가 아직 없어서 임시 배열 체크 유지
     if (EXISTING_EMAILS.includes(email)) {
       setEmailMsg("이미 가입된 이메일입니다.");
       setEmailChecked(false);
@@ -249,6 +257,10 @@ function Signup() {
       newErrors.phone1 = "휴대폰 번호를 정확히 입력하세요.";
     }
 
+    if (!form.telecomProvider) {
+      newErrors.telecomProvider = "통신사를 선택하세요.";
+    }
+
     if (!form.gender) {
       newErrors.gender = "성별을 선택하세요.";
     }
@@ -277,12 +289,57 @@ function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm() || isSubmitting) return;
 
-    console.log("회원가입 데이터:", form);
+    const payload = {
+      username: form.userid.trim(),
+      password: form.password,
+      full_name: form.name.trim(),
+      email: `${form.emailId.trim()}@${form.emailDomain.trim()}`,
+      gender: form.gender === "male" ? "남" : "녀",
+      birth_date: `${form.year}-${String(form.month).padStart(2, "0")}-${String(
+        form.day,
+      ).padStart(2, "0")}`,
+      phone_number: `${form.phone1}-${form.phone2}-${form.phone3}`,
+      telecom_provider: form.telecomProvider,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message || "회원가입이 완료되었습니다.");
+        setForm(INITIAL_FORM);
+        setErrors({});
+        setIdChecked(false);
+        setEmailChecked(false);
+        setIdMsg("");
+        setEmailMsg("");
+        setDomainReadOnly(false);
+        navigate("/login");
+      } else {
+        alert(data.message || data.error || "회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원가입 오류:", error);
+      alert("서버와 연결할 수 없습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -315,7 +372,6 @@ function Signup() {
             gridTemplateColumns: { xs: "1fr", md: "320px 1fr" },
           }}
         >
-          {/* 왼쪽 브랜딩 영역 */}
           <Box
             sx={{
               background: "linear-gradient(180deg, #edf7ee 0%, #f8fbf8 100%)",
@@ -374,7 +430,6 @@ function Signup() {
             </Typography>
           </Box>
 
-          {/* 오른쪽 폼 영역 */}
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
             <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
               회원가입
@@ -655,6 +710,24 @@ function Signup() {
                   </Typography>
                 </Box>
 
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="통신사"
+                  name="telecomProvider"
+                  value={form.telecomProvider}
+                  onChange={handleChange}
+                  error={!!errors.telecomProvider}
+                  helperText={errors.telecomProvider || " "}
+                >
+                  <MenuItem value="">선택</MenuItem>
+                  <MenuItem value="SKT">SKT</MenuItem>
+                  <MenuItem value="KT">KT</MenuItem>
+                  <MenuItem value="LGU+">LGU+</MenuItem>
+                  <MenuItem value="알뜰폰">알뜰폰</MenuItem>
+                </TextField>
+
                 <Divider />
 
                 <Box>
@@ -750,6 +823,7 @@ function Signup() {
                   type="submit"
                   variant="contained"
                   fullWidth
+                  disabled={isSubmitting}
                   sx={{
                     mt: 1,
                     py: 1.3,
