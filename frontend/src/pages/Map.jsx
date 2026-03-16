@@ -1,21 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
+import MainHeader from "../components/MainHeader";
 
-function Map() {
+export default function Map() {
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  const handleChangeSearch = (e) => {
+    setSearchKeyword(e.target.value);
+  };
+
+  const handleSearch = () => {
+    console.log("검색어:", searchKeyword);
+  };
+
   return (
-    <div className="map-container">
-      <h1>공원 지도</h1>
-
-      <div
-        style={{
-          width: "100%",
-          height: "500px",
-          backgroundColor: "#eee",
-        }}
-      >
-        지도 표시 영역
-      </div>
+    <div>
+      <MainHeader
+        searchKeyword={searchKeyword}
+        onChangeSearch={handleChangeSearch}
+        onSearch={handleSearch}
+      />
     </div>
   );
 }
-
-export default Map;
