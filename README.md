@@ -1,89 +1,52 @@
-# human_mini(test)
+# 🌳 NearGarden (니어가든)
+> **"내 손안의 작은 쉼표, 가장 가까운 도심 속 녹지를 찾아서"**
 
-# ✍ 변수 작명법
-
-1. `카멜 표기법(Camel Case)`<br>
-   - 형식 : 첫 단어는 소문자, 이후 단어의 첫 글자는 대문자
-   - 예 ) userName, handleSubmit, babMatItDa
-   - 긴 변수명을 사용할 때 사용
-
-2. `파스칼 표기법(Pascal Case)`<br>
-   - 형식 : 모든 단어의 첫 글자가 대문자
-   - 예 ) Calculator, UserProfile
-   - 클래스명, React 컴포넌트, 타입, 인터페이스 에 주로 사용
-
-3. `스네이크 표기법(Snake Case)`<br>
-   - 형식 : 단어 사이에 '\_'로 연결
-   - 예 ) user_name, total_price, p_num
-   - Python, DB 컬럼명
-
-4. `UPPER_SNAKE_CASE`<br>
-   - 전부 대문자를 사용하며 문자와 문자 사이 '\_'로 연결
-   - 예 ) BASE_URL, MAX_SIZE, API_KEY
-   - 상수(constant), 환경변수에 사용
-
-5. `케밥 표기법(Kebab Case)`<br>
-   - 전부 소문자를 사용하며 문자와 문자 사이 '-'로 연결
-   - 예 ) login-btn, post-container
-   - css 클래스, 파일명에 주로 사용
-
-6. `헝가리안 표기법(Hungarian Case)`<br>
-   - 타입을 이름 앞에 붙이며 소문자로 시작하여 이후 첫글자만 대문자
-   - 예 ) strName, intCount, arrList
-   - JS / Python 에서 사용하나 최근엔 안 쓰는 추세
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-20232a?style=flat-square&logo=react&logoColor=61dafb)](https://reactjs.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 프로젝트 Convention
+## 📌 프로젝트 개요 (Project Overview)
+**NearGarden**은 사용자의 현재 위치를 기반으로 주변의 **근린공원 및 녹지 정보**를 빠르게 검색하고 안내해주는 웹 서비스입니다. 
 
-### React
+도심 속에서 휴식이 필요한 순간, 멀리 나가지 않아도 내 주변에 숨겨진 공원을 찾아내어 시설 정보와 경로를 제공함으로써 현대인의 정서적 안정과 건강한 여가 생활을 돕는 것을 목적으로 합니다.
 
-      * 변수 : camelCase
-         - userName, postList, isLoading,hasError
+## ✨ 주요 기능 (Key Features)
+- **📍 실시간 위치 기반 검색**: Geolocation API를 활용하여 현재 위치 주변의 공원을 거리순으로 나열합니다.
+- **🗺️ 인터랙티브 지도**: 지도 위에 공원 위치를 마커로 표시하고, 상세 위치를 시각적으로 제공합니다.
+- **ℹ️ 상세 시설 정보**: 공원 내 운동기구, 산책로, 화장실, 벤치 등 주요 편의시설 유무를 확인합니다.
+- **🔍 스마트 필터링**: 주차 가능 여부, 반려동물 동반 가능 여부 등 조건에 맞는 공원을 필터링할 수 있습니다. (구현 예정)
+- **⚡ 빠른 데이터 처리**: 공공데이터포털의 전국 도시공원 정보를 FastAPI를 통해 비동기로 빠르게 전달합니다.
 
-      * 상수 : UPPER_SNAKE_CASE
-         - API_BASE_URL, MAX_RETRY_COUNT, DEFAULT_PAGE_SIZE
+## 🛠 기술 스택 (Tech Stack)
+### **Backend**
+- **Framework**: FastAPI
+- **Language**: Python 3.9+
+- **Database**: PostgreSQL / SQLAlchemy (ORM)
+- **Data Source**: 공공데이터포털 (전국도시공원표준데이터)
 
-      * 함수 : camelCase
-         - handleClick(), fetchUser(), createPost()
+### **Frontend**
+- **Library**: React.js
+- **State Management**: React Context API
+- **Map API**: Google Maps API / Kakao Maps API
+- **Styling**: Tailwind CSS
 
-      * 클래스 : PascalCase
-         - Calculator
-
-      * 컴포넌트 파일 : PascalCase
-         - UserCard.jsx, PostList.tsx,Header.tsx
-
-      * utils / services : camelCase
-         - apiClient.js, dateFormatter.js, authService.js
-
-      * hooks 파일 : use + camelCase
-         - useAuth.js, useFetchData.js
-
-      * css 파일 : kebab-case
-         - reset.css, global-style.css, main-layout.css
-         - .user-card {}, .post-item {}, .main-header {}
-
-      * 환경변수 파일 or 상수 파일명 : camelCase
-         - data.js
-
-### Python(fastapi)
-
-      * 변수 : snake_case
-         - user_name, post_list, is_loading, has_error
-
-      * 상수 : UPPER_SNAKE_CASE
-         - API_BASE_URL, MAX_RETRY_COUNT, DEFAULT_PAGE_SIZE, SECRET_KEY
-
-      * 함수 : snake_case
-         - get_user(), create_post(), fetch_users(), handle_webhook()
-         - 라우터 핸들러도 보통 snake_case: read_posts(), update_user()
-
-      * 클래스 : PascalCase
-         - UserService, PostRepository, Settings, HTTPException
-
-      * services / repositories : snake_case
-         - user_service.py, auth_service.py, post_repository.py
-
-### DB
-
-      - 스키마/테이블/컬럼/PK/FK/인덱스 등 : snake_case
+## 📂 프로젝트 구조 (Project Structure)
+```text
+near-garden/
+├── backend/            # FastAPI source code
+│   ├── app/
+│   │   ├── api/        # API Endpoints
+│   │   ├── core/       # Configurations
+│   │   ├── models/     # Database Models
+│   │   └── schemas/    # Pydantic Schemas
+│   └── main.py
+├── frontend/           # React source code
+│   ├── public/
+│   └── src/
+│       ├── components/ # Reusable UI Components
+│       ├── pages/      # Page Views
+│       └── services/   # API Call Logic
+└── README.md
